@@ -3,10 +3,11 @@ import uuid from "react-uuid";
 import "./style.css";
 
 const App = () => {
+  const electron = window.require("electron");
   const [title, setTitle] = useState("");
   const [blogPost, setBlogPost] = useState("");
-  const [resp, setResp] = useState();
-  const [err, setError] = useState();
+  const [responseFromApi, setResp] = useState();
+
 
   let createPost = () => {
     if (!title && !blogPost) {
@@ -25,18 +26,19 @@ const App = () => {
       },
     })
       .then((resp) => resp.json())
-      .then((resp) => setResp(resp))
-      .catch((e) => setError("Error Occured"));
+      .then((resp) => setResp('Your Post was successfuly created'))
+      .catch((e) => setResp("Error Occured, please try again"));
   };
 
+  console.log(electron.ipcRenderer.send)
   return (
-    <div class="container">
-      <div class="form">
-        <div class="headings">
+    <div className="container">
+      <div className="form">
+        <div className="headings">
           <h1>Testing React with Electron</h1>
           <h2>Write some blog post!</h2>
         </div>
-        <div class="title_input_container">
+        <div className="title_input_container">
           <p>Title of blog post</p>
           <input
             className="title_blog_post"
@@ -45,7 +47,7 @@ const App = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <div class="blog_container">
+        <div className="blog_container">
           <p>Write your blog</p>
           <textarea
             className="blog"
@@ -59,7 +61,9 @@ const App = () => {
           <button className="submit_button" onClick={createPost}>
             Create Post
           </button>
+          {responseFromApi ? electron.ipcRenderer.send('send_message',responseFromApi) : null}
         </div>
+        
       </div>
     </div>
   );
